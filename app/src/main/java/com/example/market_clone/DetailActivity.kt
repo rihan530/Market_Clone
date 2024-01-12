@@ -1,8 +1,8 @@
 package com.example.market_clone
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.market_clone.databinding.ActivityDetailBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.NumberFormat
@@ -30,7 +30,7 @@ class DetailActivity : AppCompatActivity() {
             _binding!!.location.text = it.location
             _binding!!.detailName.text = it.productName
             _binding!!.detailContent.text = it.detailText
-            _binding!!.price.text = moneyFormat.format(it.price).toString()+"원"
+            _binding!!.price.text = "${moneyFormat.format(it.price)}원"
             isLiked = it.isLiked == true
 
             _binding!!.detailLikeIcon.setImageResource(if (isLiked) {

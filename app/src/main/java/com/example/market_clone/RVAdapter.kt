@@ -18,7 +18,13 @@ class RVAdapter(private val productList: MutableList<ProductInfo>): RecyclerView
         fun onClick(view : View, position : Int)
     }
 
-    var itemClick : ItemClick? = null
+    var itemClick: ItemClick? = null
+
+    interface ItemLongClick {
+        fun onLongClick(view: View, position: Int)
+    }
+
+    var itemLongClick: ItemLongClick? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RVAdapter.ViewHolder {
         val binding: RecyclerviewProductItemBinding = RecyclerviewProductItemBinding.inflate(LayoutInflater.from(parent.context))
@@ -40,7 +46,6 @@ class RVAdapter(private val productList: MutableList<ProductInfo>): RecyclerView
         } else {
             holder.likeIcon.setImageResource(R.drawable.ic_heart)
         }
-
 //        holder.bind(productList[position])
     }
 
@@ -66,6 +71,15 @@ class RVAdapter(private val productList: MutableList<ProductInfo>): RecyclerView
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     itemClick?.onClick(it, position)
+                }
+            }
+            binding.root.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    itemLongClick?.onLongClick(it, position)
+                    true
+                } else {
+                    false
                 }
             }
         }

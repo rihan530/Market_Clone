@@ -13,12 +13,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AlphaAnimation
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.market_clone.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -75,7 +77,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.ivNoti.setOnClickListener {
+        adapter.itemLongClick = object : RVAdapter.ItemLongClick {
+            override fun onLongClick(view: View, position: Int) {
+                AlertDialog.Builder(this@MainActivity)
+                    .setIcon(R.drawable.ic_chat)
+                    .setTitle("삭제")
+                    .setMessage("정말로 삭제하시겠습니까?")
+                    .setPositiveButton("확인") { _, _ ->
+                        productList.removeAt(position)
+                        adapter.notifyDataSetChanged()
+                    }
+                    .setNegativeButton("취소") {dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
+        }
+
+        _binding!!.ivNoti.setOnClickListener {
             createNotification()
         }
 
@@ -96,7 +115,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 500 }
+        val fadeOut = AlphaAnimation(1f, 0f).apply { duration = 500 }
+        var isTop = true
 
+        _binding!!.recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!_binding!!.recyclerView.canScrollVertically(-1)
+                    && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    _binding!!.floating.startAnimation(fadeOut)
+                    _binding!!.floating.visibility = View.INVISIBLE
+                    isTop = true
+                } else {
+                    if (isTop) {
+                        _binding!!.floating.visibility = View.VISIBLE
+                        _binding!!.floating.startAnimation(fadeIn)
+                        isTop = false
+                    }
+                }
+            }
+        })
+
+        _binding!!.floating.setOnClickListener {
+            _binding!!.recyclerView.smoothScrollToPosition(0)
+        }
     }
 
     @SuppressLint("NotificationPermission")
